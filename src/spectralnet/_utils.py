@@ -11,11 +11,18 @@ from sklearn.neighbors import NearestNeighbors
 def build_ann(X: torch.Tensor):
     """
     Builds approximate-nearest-neighbors object
-    that can be used to calculate the knn of a data-point
+    that can be used to calculate the k-nearest neighbors of a data-point
 
-    Args:
-        X:  dataset
+    Parameters
+    ----------
+    X : torch.Tensor
+        Dataset.
+
+    Returns
+    -------
+    None
     """
+
     X = X.view(X.size(0), -1)
     t = AnnoyIndex(X[0].shape[0], "euclidean")
     for i, x_i in enumerate(X):
@@ -27,16 +34,20 @@ def build_ann(X: torch.Tensor):
 
 def make_batch_for_sparse_grapsh(batch_x: torch.Tensor) -> torch.Tensor:
     """
-    Computes new batch of data points from the given batch (batch_x)
+    Computes a new batch of data points from the given batch (batch_x)
     in case that the graph-laplacian obtained from the given batch is sparse.
     The new batch is computed based on the nearest neighbors of 0.25
-    of the given batch
+    of the given batch.
 
-    Args:
-        batch_x:    Batch of data points
+    Parameters
+    ----------
+    batch_x : torch.Tensor
+        Batch of data points.
 
-    Returns:
-        New batch of data points
+    Returns
+    -------
+    torch.Tensor
+        New batch of data points.
     """
 
     batch_size = batch_x.shape[0]
@@ -59,13 +70,17 @@ def make_batch_for_sparse_grapsh(batch_x: torch.Tensor) -> torch.Tensor:
 
 def get_laplacian(W: torch.Tensor) -> np.ndarray:
     """
-    Computes the unnormalized Laplacian matrix, given the affinity matrix W
+    Computes the unnormalized Laplacian matrix, given the affinity matrix W.
 
-    Args:
-        W (torch.Tensor):   Affinity matrix
+    Parameters
+    ----------
+    W : torch.Tensor
+        Affinity matrix.
 
-    Returns:
-        Laplacian matrix
+    Returns
+    -------
+    np.ndarray
+        Laplacian matrix.
     """
 
     W = W.detach().cpu().numpy()
@@ -76,15 +91,20 @@ def get_laplacian(W: torch.Tensor) -> np.ndarray:
 
 def sort_laplacian(L: np.ndarray, y: np.ndarray) -> np.ndarray:
     """
-    Sorts the columns and the rows of the laplacian by the true lablel in order
-    to see whether the sorted laplacian is a block diagonal matrix
+    Sorts the columns and rows of the Laplacian by the true labels in order
+    to see whether the sorted Laplacian is a block diagonal matrix.
 
-    Args:
-        L:  Laplacian matrix
-        y:  labels
+    Parameters
+    ----------
+    L : np.ndarray
+        Laplacian matrix.
+    y : np.ndarray
+        Labels.
 
-    Returns:
-        Sorted laplacian
+    Returns
+    -------
+    np.ndarray
+        Sorted Laplacian.
     """
 
     i = np.argsort(y)
@@ -95,11 +115,19 @@ def sort_laplacian(L: np.ndarray, y: np.ndarray) -> np.ndarray:
 
 def sort_matrix_rows(A: np.ndarray, y: np.ndarray) -> np.ndarray:
     """
-    Sorts the rows of a matrix by a given order y
+    Sorts the rows of a matrix by a given order.
 
-    Args:
-        A:  Numpy ndarray
-        y:  True labels
+    Parameters
+    ----------
+    A : np.ndarray
+        Numpy ndarray.
+    y : np.ndarray
+        True labels.
+
+    Returns
+    -------
+    np.ndarray
+        Sorted matrix.
     """
 
     i = np.argsort(y)
@@ -109,13 +137,17 @@ def sort_matrix_rows(A: np.ndarray, y: np.ndarray) -> np.ndarray:
 
 def get_eigenvalues(A: np.ndarray) -> np.ndarray:
     """
-    Computes the eigenvalues of a given matrix A and sorts them in increasing order
+    Computes the eigenvalues of a given matrix A and sorts them in increasing order.
 
-    Args:
-        A:  Numpy ndarray
+    Parameters
+    ----------
+    A : np.ndarray
+        Numpy ndarray.
 
-    Returns:
-        Sorted eigenvalues
+    Returns
+    -------
+    np.ndarray
+        Sorted eigenvalues.
     """
 
     _, vals, _ = np.linalg.svd(A)
@@ -125,12 +157,17 @@ def get_eigenvalues(A: np.ndarray) -> np.ndarray:
 
 def get_eigenvectors(A: np.ndarray) -> np.ndarray:
     """
-    Computes the eigenvectors of a given matrix A and sorts them by the eigenvalues
-    Args:
-        A:  Numpy ndarray
+    Computes the eigenvectors of a given matrix A and sorts them by the eigenvalues.
 
-    Returns:
-        Sorted eigenvectors
+    Parameters
+    ----------
+    A : np.ndarray
+        Numpy ndarray.
+
+    Returns
+    -------
+    np.ndarray
+        Sorted eigenvectors.
     """
 
     vecs, vals, _ = np.linalg.svd(A)
@@ -140,10 +177,12 @@ def get_eigenvectors(A: np.ndarray) -> np.ndarray:
 
 def plot_eigenvalues(vals: np.ndarray):
     """
-    Plot the eigenvalues of the laplacian
+    Plot the eigenvalues of the Laplacian.
 
-    Args:
-        vals:   Eigenvalues
+    Parameters
+    ----------
+    vals : np.ndarray
+        Eigenvalues.
     """
 
     rang = range(len(vals))
@@ -153,12 +192,21 @@ def plot_eigenvalues(vals: np.ndarray):
 
 def get_laplacian_eigenvectors(V: torch.Tensor, y: np.ndarray) -> np.ndarray:
     """
-    Returns eigenvectors of the laplacian when the data is in increasing order by the true label.
-    i.e., the rows of the eigenvectors matrix V are sorted by the true labels in increasing order.
+    Returns eigenvectors of the Laplacian when the data is sorted in increasing
+    order by the true label.
 
-    Args:
-        V:  Eigenvectors matrix
-        y:  True labels
+    Parameters
+    ----------
+    V : torch.Tensor
+        Eigenvectors matrix.
+    y : np.ndarray
+        True labels.
+
+    Returns
+    -------
+    np.ndarray
+        Sorted eigenvectors matrix and range.
+
     """
 
     V = sort_matrix_rows(V, y)
@@ -168,15 +216,22 @@ def get_laplacian_eigenvectors(V: torch.Tensor, y: np.ndarray) -> np.ndarray:
 
 def plot_laplacian_eigenvectors(V: np.ndarray, y: np.ndarray):
     """
-    Plot the eigenvectors of the laplacian when the data is in increasing order by the true label.
-    i.e., the rows of the eigenvectors matrix V are sorted by the true labels in increasing order.
+    Plot the eigenvectors of the Laplacian when the data is sorted in increasing
+    order by the true label.
 
-    Args:
-        V:  Eigenvectors matrix
-        y:  True labels
+    Parameters
+    ----------
+    V : np.ndarray
+        Eigenvectors matrix.
+    y : np.ndarray
+        True labels.
+
+    Returns
+    -------
+    plt.Axes
+        The matplotlib Axes object containing the plot.
     """
 
-    # sort the rows of V
     V = sort_matrix_rows(V, y)
     rang = range(len(y))
     plt.plot(rang, V)
@@ -186,11 +241,14 @@ def plot_laplacian_eigenvectors(V: np.ndarray, y: np.ndarray):
 
 def plot_sorted_laplacian(W: torch.Tensor, y: np.ndarray):
     """
-    Plot the block diagonal matrix that is obtained from the sorted laplacian
+    Plot the block diagonal matrix obtained from the sorted Laplacian.
 
-    Args:
-        W:  Affinity matrix
-        y:  True labels
+    Parameters
+    ----------
+    W : torch.Tensor
+        Affinity matrix.
+    y : np.ndarray
+        True labels.
     """
     L = get_laplacian(W)
     L = sort_laplacian(L, y)
@@ -203,16 +261,21 @@ def get_nearest_neighbors(
     X: torch.Tensor, Y: torch.Tensor = None, k: int = 3
 ) -> tuple[np.ndarray, np.ndarray]:
     """
-    Computes the distances and the indices of the
-    k nearest neighbors of each data point
+    Computes the distances and the indices of the k nearest neighbors of each data point.
 
-    Args:
-        X:              Batch of data points
-        Y (optional):   Defaults to None.
-        k:              Number of nearest neighbors to calculate. Defaults to 3.
+    Parameters
+    ----------
+    X : torch.Tensor
+        Batch of data points.
+    Y : torch.Tensor, optional
+        Defaults to None.
+    k : int, optional
+        Number of nearest neighbors to calculate. Defaults to 3.
 
-    Returns:
-        Distances and indices of each datapoint
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        Distances and indices of each data point.
     """
 
     if Y is None:
@@ -228,11 +291,19 @@ def get_nearest_neighbors(
 
 def get_grassman_distance(A: np.ndarray, B: np.ndarray) -> float:
     """
-    Computes the Grassmann distance between the subspaces spanned by the columns of A and B
+    Computes the Grassmann distance between the subspaces spanned by the columns of A and B.
 
-    Args:
-        A:  Numpy ndarray
-        B:  Numpy ndarray
+    Parameters
+    ----------
+    A : np.ndarray
+        Numpy ndarray.
+    B : np.ndarray
+        Numpy ndarray.
+
+    Returns
+    -------
+    float
+        The Grassmann distance.
     """
 
     M = np.dot(np.transpose(A), B)
@@ -246,17 +317,24 @@ def compute_scale(
     Dis: np.ndarray, k: int = 2, med: bool = True, is_local: bool = True
 ) -> np.ndarray:
     """
-    Computes the scale for the Gaussian similarity function
+    Computes the scale for the Gaussian similarity function.
 
-    Args:
-        Dis:            Distances of the k nearest neighbors of each data point.
-        k (optional):   Number of nearest neighbors for the scale calculation. Relevant for global scale only.
-        med:            Scale calculation method. Can be calculated by the median distance
-                        from a data point to its neighbors, or by the maximum distance.
-        is_local:       Local distance (different for each data point), or global distance. Defaults to local.
+    Parameters
+    ----------
+    Dis : np.ndarray
+        Distances of the k nearest neighbors of each data point.
+    k : int, optional
+        Number of nearest neighbors for the scale calculation. Relevant for global scale only.
+    med : bool, optional
+        Scale calculation method. Can be calculated by the median distance from a data point to its neighbors,
+        or by the maximum distance. Defaults to True.
+    is_local : bool, optional
+        Local distance (different for each data point), or global distance. Defaults to True.
 
-    Returns:
-        scale (global or local)
+    Returns
+    -------
+    np.ndarray
+        Scale (global or local).
     """
 
     if is_local:
@@ -276,18 +354,25 @@ def get_gaussian_kernel(
     D: torch.Tensor, scale, Ids: np.ndarray, device: torch.device, is_local: bool = True
 ) -> torch.Tensor:
     """
-    Computes the Gaussian similarity function
-    according to a given distance matrix D and a given scale
+    Computes the Gaussian similarity function according to a given distance matrix D and a given scale.
 
-    Args:
-        D:      Distance matrix
-        scale:  scale
-        Ids:    Indices of the k nearest neighbors of each sample
-        device: Defaults to torch.device("cpu")
-        is_local:  Determines whether the given scale is global or local
+    Parameters
+    ----------
+    D : torch.Tensor
+        Distance matrix.
+    scale :
+        Scale.
+    Ids : np.ndarray
+        Indices of the k nearest neighbors of each sample.
+    device : torch.device
+        Defaults to torch.device("cpu").
+    is_local : bool, optional
+        Determines whether the given scale is global or local. Defaults to True.
 
-    Returns:
-        Matrix W with Gaussian similarities
+    Returns
+    -------
+    torch.Tensor
+        Matrix W with Gaussian similarities.
     """
 
     if not is_local:
@@ -309,14 +394,16 @@ def get_gaussian_kernel(
     return sym_W
 
 
-def plot_data_by_assignmets(X, assignments: np.ndarray):
+def plot_data_by_assignments(X, assignments: np.ndarray):
     """
-    Plots the data with the assignments obtained from SpectralNet.
-    Relevant only for 2D data
+    Plots the data with the assignments obtained from SpectralNet. Relevant only for 2D data.
 
-    Args:
-        X:                      Data
-        cluster_assignments:    Cluster assignments
+    Parameters
+    ----------
+    X :
+        Data.
+    assignments : np.ndarray
+        Cluster assignments.
     """
 
     plt.scatter(X[:, 0], X[:, 1], c=assignments)
@@ -325,15 +412,21 @@ def plot_data_by_assignmets(X, assignments: np.ndarray):
 
 def calculate_cost_matrix(C: np.ndarray, n_clusters: int) -> np.ndarray:
     """
-    Calculates the cost matrix for the Munkres algorithm
+    Calculates the cost matrix for the Munkres algorithm.
 
-    Args:
-        C (np.ndarray):     Confusion matrix
-        n_clusters (int):   Number of clusters
+    Parameters
+    ----------
+    C : np.ndarray
+        Confusion matrix.
+    n_clusters : int
+        Number of clusters.
 
-    Returns:
-        np.ndarray:        Cost matrix
+    Returns
+    -------
+    np.ndarray
+        Cost matrix.
     """
+
     cost_matrix = np.zeros((n_clusters, n_clusters))
     # cost_matrix[i,j] will be the cost of assigning cluster i to label j
     for j in range(n_clusters):
@@ -346,13 +439,17 @@ def calculate_cost_matrix(C: np.ndarray, n_clusters: int) -> np.ndarray:
 
 def get_cluster_labels_from_indices(indices: np.ndarray) -> np.ndarray:
     """
-    Gets the cluster labels from their indices
+    Gets the cluster labels from their indices.
 
-    Args:
-        indices (np.ndarray):  Indices of the clusters
+    Parameters
+    ----------
+    indices : np.ndarray
+        Indices of the clusters.
 
-    Returns:
-        np.ndarray:   Cluster labels
+    Returns
+    -------
+    np.ndarray
+        Cluster labels.
     """
 
     num_clusters = len(indices)
@@ -362,12 +459,14 @@ def get_cluster_labels_from_indices(indices: np.ndarray) -> np.ndarray:
     return cluster_labels
 
 
-def write_assignmets_to_file(assignments: np.ndarray):
+def write_assignments_to_file(assignments: np.ndarray):
     """
-    Saves SpectralNet cluster assignments to a file
+    Saves SpectralNet cluster assignments to a file.
 
-    Args:
-        assignments (np.ndarray): The assignments that obtained from SpectralNet
+    Parameters
+    ----------
+    assignments : np.ndarray
+        The assignments that obtained from SpectralNet.
     """
 
     np.savetxt(
