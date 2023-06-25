@@ -67,7 +67,6 @@ class AETrainer:
                 )
             )
 
-        torch.save(self.ae_net.state_dict(), self.weights_path)
         return self.ae_net
 
     def validate(self, valid_loader: DataLoader) -> float:
@@ -88,7 +87,7 @@ class AETrainer:
         self.ae_net.eval()
         with torch.no_grad():
             X = X.view(X.size(0), -1)
-            encoded_data = self.ae_net.encoder(X.to(self.device))
+            encoded_data = self.ae_net.encode(X.to(self.device))
         return encoded_data
 
     def _get_data_loader(self) -> tuple:

@@ -14,7 +14,7 @@ class SpectralNet:
         should_use_siamese: bool = False,
         is_sparse_graph: bool = False,
         ae_hiddens: list = [512, 512, 2048, 10],
-        ae_epochs: int = 30,
+        ae_epochs: int = 40,
         ae_lr: float = 1e-3,
         ae_lr_decay: float = 0.1,
         ae_min_lr: float = 1e-7,
@@ -28,7 +28,7 @@ class SpectralNet:
         siamese_patience: int = 10,
         siamese_n_nbg: int = 2,
         siamese_use_approx: bool = False,
-        siamese_batch_size: int = 256,
+        siamese_batch_size: int = 128,
         spectral_hiddens: list = [1024, 1024, 512, 10],
         spectral_epochs: int = 30,
         spectral_lr: float = 1e-3,
@@ -162,7 +162,6 @@ class SpectralNet:
         y : torch.Tensor, optional
             Labels in case there are any. Defaults to None.
         """
-        # create_weights_dir()
         ae_config = {
             "hiddens": self.ae_hiddens,
             "epochs": self.ae_epochs,
@@ -236,7 +235,7 @@ class SpectralNet:
 
         with torch.no_grad():
             if self.should_use_ae:
-                X = self.ae_net.encoder(X)
+                X = self.ae_net.encode(X)
             self.embeddings_ = self.spec_net(X, should_update_orth_weights=False)
             self.embeddings_ = self.embeddings_.detach().cpu().numpy()
 

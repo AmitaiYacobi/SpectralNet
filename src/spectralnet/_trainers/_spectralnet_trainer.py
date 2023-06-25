@@ -83,7 +83,9 @@ class SpectralTrainer:
         self.spectral_net = SpectralNetModel(
             self.architecture, input_dim=self.X.shape[1]
         ).to(self.device)
+
         self.optimizer = optim.Adam(self.spectral_net.parameters(), lr=self.lr)
+
         self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(
             self.optimizer, mode="min", factor=self.lr_decay, patience=self.patience
         )

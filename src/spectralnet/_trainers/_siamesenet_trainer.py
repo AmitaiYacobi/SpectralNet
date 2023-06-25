@@ -102,7 +102,6 @@ class SiameseTrainer:
                 )
             )
 
-        torch.save(self.siamese_net.state_dict(), self.weights_path)
         return self.siamese_net
 
     def validate(self, valid_loader: DataLoader) -> float:
