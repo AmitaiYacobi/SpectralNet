@@ -4,11 +4,11 @@ import torch
 import random
 import numpy as np
 
-from utils import *
-from data import load_data
-from metrics import Metrics
+from spectralnet._utils import *
+from old.data import load_data
+from spectralnet._metrics import Metrics
 from sklearn.cluster import KMeans
-from SpectralNet import SpectralNet
+from old.SpectralNet import SpectralNet
 from scipy.spatial.distance import cdist
 
 

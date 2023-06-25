@@ -1,10 +1,10 @@
 import torch
 import numpy as np
 
-from AETrainer import *
-from SiameseTrainer import *
-from SpectralTrainer import *
+from ._utils import *
 from sklearn.cluster import KMeans
+from ._trainers import SpectralTrainer, SiameseTrainer, AETrainer
+
 
 
 class SpectralNet:
@@ -89,4 +89,3 @@ class SpectralNet:
         kmeans = KMeans(n_clusters=self.n_clusters, n_init=10).fit(embeddings)
         cluster_assignments = kmeans.predict(embeddings)
         return cluster_assignments
-    

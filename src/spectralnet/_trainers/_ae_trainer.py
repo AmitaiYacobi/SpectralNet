@@ -2,37 +2,10 @@ import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
+
+from ._trainer import Trainer
+from .._models import AEModel 
 from torch.utils.data import DataLoader, random_split
-
-class AE(nn.Module):
-    def __init__(self, architecture: dict, input_dim: int):
-        super(AE, self).__init__()
-        self.architecture = architecture
-
-        self.encoder = nn.Sequential(
-            nn.Linear(input_dim, self.architecture["hidden_dim1"]),
-            nn.ReLU(),
-            nn.Linear(self.architecture["hidden_dim1"], self.architecture["hidden_dim2"]),
-            nn.ReLU(),
-            nn.Linear(self.architecture["hidden_dim2"], self.architecture["hidden_dim3"]),
-            nn.ReLU(),
-            nn.Linear(self.architecture["hidden_dim3"], self.architecture["output_dim"]),
-        )
-        self.decoder = nn.Sequential(
-            nn.Linear(self.architecture["output_dim"], self.architecture["hidden_dim3"]),
-            nn.ReLU(),
-            nn.Linear(self.architecture["hidden_dim3"], self.architecture["hidden_dim2"]),
-            nn.ReLU(),
-            nn.Linear(self.architecture["hidden_dim2"], self.architecture["hidden_dim1"]),
-            nn.ReLU(),
-            nn.Linear(self.architecture["hidden_dim1"], input_dim),
-        )
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.encoder(x)
-        x = self.decoder(x)
-        return x
-
 
 class AETrainer:
     def __init__(self, config: dict, device: torch.device):
@@ -53,7 +26,7 @@ class AETrainer:
         self.architecture = self.ae_config["architecture"]
         self.weights_path = "./weights/ae_weights.pth"
     
-    def train(self, X: torch.Tensor) -> AE:
+    def train(self, X: torch.Tensor) -> AEModel:
         """
         This function trains the autoencoder on the given data.
 
@@ -66,7 +39,7 @@ class AETrainer:
         """
         self.X = X.view(X.size(0), -1)
         self.criterion = nn.MSELoss()
-        self.ae_net = AE(self.architecture, input_dim=self.X.shape[1]).to(self.device)
+        self.ae_net = AEModel(self.architecture, input_dim=self.X.shape[1]).to(self.device)
         self.optimizer = optim.Adam(self.ae_net.parameters(), lr=self.lr)
         self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 
                                                               mode="min", 
