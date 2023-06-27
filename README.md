@@ -3,7 +3,7 @@
 <p align="center">
     <img src="https://github.com/AmitaiYacobi/SpectralNet01/blob/main/figures/twomoons.png">
 
-SpectralNet is a python package that performs spectral clustering with deep neural networks.<br><br>
+SpectralNet is a Python package that performs spectral clustering with deep neural networks.<br><br>
 This package is based on the following paper - [SpectralNet](https://openreview.net/pdf?id=HJ_aoCyRZ)
 
 ## Installation
@@ -16,7 +16,7 @@ pip install spectralnet
 
 ## Usage
 
-The basic functionlaity is quite intuitive and easy to use, e.g.,
+The basic functionality is quite intuitive and easy to use, e.g.,
 
 ```python
 from spectralnet import SpectralNet
