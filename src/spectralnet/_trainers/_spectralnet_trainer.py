@@ -95,7 +95,7 @@ class SpectralTrainer:
         print("Training SpectralNet:")
         for epoch in range(self.epochs):
             train_loss = 0.0
-            for (X_grad, y_grad), (X_orth, _) in zip(train_loader, ortho_loader):
+            for (X_grad, _), (X_orth, _) in zip(train_loader, ortho_loader):
                 X_grad = X_grad.to(device=self.device)
                 X_grad = X_grad.view(X_grad.size(0), -1)
                 X_orth = X_orth.to(device=self.device)
@@ -163,8 +163,6 @@ class SpectralTrainer:
                 loss = self.criterion(W, Y)
                 valid_loss += loss.item()
 
-        if self.counter % 10 == 0:
-            plot_sorted_laplacian(W, y)
         self.counter += 1
 
         valid_loss /= len(valid_loader)
