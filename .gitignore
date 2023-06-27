@@ -3,3 +3,5 @@ __pycache__
 *main.py
 *data.py
 data
+dist
+*spectralnet.egg-info
