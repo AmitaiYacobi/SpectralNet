@@ -38,7 +38,7 @@ class SpectralNet:
         spectral_batch_size: int = 1024,
         spectral_n_nbg: int = 30,
         spectral_scale_k: int = 15,
-        spectral_is_local_scale: bool = False,
+        spectral_is_local_scale: bool = True,
     ):
         """SpectralNet is a class for implementing a Deep learning model that performs spectral clustering.
         This model optionally utilizes Autoencoders (AE) and Siamese networks for training.

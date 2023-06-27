@@ -10,20 +10,25 @@ class AEModel(nn.Module):
         self.decoder = nn.ModuleList()
 
         current_dim = input_dim
-        for layer in self.architecture:
+        for i, layer in enumerate(self.architecture):
             next_dim = layer
-            self.encoder.append(
-                nn.Sequential(nn.Linear(current_dim, next_dim), nn.ReLU())
-            )
-            current_dim = next_dim
+            if i == len(self.architecture) - 1:
+                self.encoder.append(nn.Sequential(nn.Linear(current_dim, next_dim)))
+            else:
+                self.encoder.append(
+                    nn.Sequential(nn.Linear(current_dim, next_dim), nn.ReLU())
+                )
+                current_dim = next_dim
 
-        self.architecture = [input_dim] + self.architecture
-        for layer in reversed(self.architecture):
+        last_dim = input_dim
+        current_dim = self.architecture[-1]
+        for i, layer in enumerate(reversed(self.architecture[:-1])):
             next_dim = layer
             self.decoder.append(
                 nn.Sequential(nn.Linear(current_dim, next_dim), nn.ReLU())
             )
             current_dim = next_dim
+        self.decoder.append(nn.Sequential(nn.Linear(current_dim, last_dim)))
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:
         for layer in self.encoder:

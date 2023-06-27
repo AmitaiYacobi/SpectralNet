@@ -163,6 +163,8 @@ class SpectralTrainer:
                 loss = self.criterion(W, Y)
                 valid_loss += loss.item()
 
+        if self.counter % 10 == 0:
+            plot_sorted_laplacian(W, y)
         self.counter += 1
 
         valid_loss /= len(valid_loader)
