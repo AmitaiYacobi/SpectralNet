@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, random_split, TensorDataset
 
+from tqdm import trange
 from spectralnet._utils import *
 from ._trainer import Trainer
 from .._losses import SpectralNetLoss
@@ -93,7 +94,8 @@ class SpectralTrainer:
         train_loader, ortho_loader, valid_loader = self._get_data_loader()
 
         print("Training SpectralNet:")
-        for epoch in range(self.epochs):
+        t = trange(self.epochs, leave=True)
+        for epoch in t:
             train_loss = 0.0
             for (X_grad, _), (X_orth, _) in zip(train_loader, ortho_loader):
                 X_grad = X_grad.to(device=self.device)
@@ -134,11 +136,12 @@ class SpectralTrainer:
             current_lr = self.optimizer.param_groups[0]["lr"]
             if current_lr <= self.spectral_config["min_lr"]:
                 break
-            print(
-                "Epoch: {}/{}, Train Loss: {:.7f}, Valid Loss: {:.7f}, LR: {:.6f}".format(
-                    epoch + 1, self.epochs, train_loss, valid_loss, current_lr
+            t.set_description(
+                "Train Loss: {:.7f}, Valid Loss: {:.7f}, LR: {:.6f}".format(
+                    train_loss, valid_loss, current_lr
                 )
             )
+            t.refresh()
 
         return self.spectral_net
 
@@ -164,6 +167,8 @@ class SpectralTrainer:
                 valid_loss += loss.item()
 
         self.counter += 1
+        if self.counter % 10 == 0:
+            plot_laplacian_eigenvectors(Y, y)
 
         valid_loss /= len(valid_loader)
         return valid_loss

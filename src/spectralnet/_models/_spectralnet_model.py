@@ -39,21 +39,13 @@ class SpectralNetModel(nn.Module):
 
         Notes
         -----
-        This function applies the Cholesky decomposition to orthonormalize the output (`Y`) of the network.
-        The orthonormalized output is returned as a tensor.
+        This function applies QR decomposition to orthonormalize the output (`Y`) of the network.
+        The inverse of the R matrix is returned as the orthonormalization weights.
         """
 
         m = Y.shape[0]
-        to_factorize = torch.mm(Y.t(), Y)
-
-        try:
-            L = torch.linalg.cholesky(to_factorize, upper=False)
-        except torch._C._LinAlgError:
-            to_factorize += 0.1 * torch.eye(to_factorize.shape[0])
-            L = torch.linalg.cholesky(to_factorize, upper=False)
-
-        L_inverse = torch.inverse(L)
-        orthonorm_weights = np.sqrt(m) * L_inverse.t()
+        _, R = torch.linalg.qr(Y)
+        orthonorm_weights = np.sqrt(m) * torch.inverse(R)
         return orthonorm_weights
 
     def forward(
@@ -78,7 +70,7 @@ class SpectralNetModel(nn.Module):
         -----
         This function takes an input tensor `x` and computes the forward pass of the model.
         If `should_update_orth_weights` is set to True, the orthonormalization weights are updated
-        using the Cholesky decomposition. The output tensor is returned.
+        using the QR decomposition. The output tensor is returned.
         """
 
         for layer in self.layers:
@@ -88,5 +80,5 @@ class SpectralNetModel(nn.Module):
         if should_update_orth_weights:
             self.orthonorm_weights = self._make_orthonorm_weights(Y_tilde)
 
-        Y = torch.mm(Y_tilde, self.orthonorm_weights)
+        Y = Y_tilde @ self.orthonorm_weights
         return Y

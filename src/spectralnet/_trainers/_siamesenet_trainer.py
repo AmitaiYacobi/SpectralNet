@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import torch.optim as optim
 
-
+from tqdm import trange
 from annoy import AnnoyIndex
 from sklearn.neighbors import NearestNeighbors
 from torch.utils.data import DataLoader, random_split
@@ -73,8 +73,9 @@ class SiameseTrainer:
         train_loader, valid_loader = self._get_data_loader()
 
         print("Training Siamese Network:")
+        t = trange(self.epochs, leave=True)
         self.siamese_net.train()
-        for epoch in range(self.epochs):
+        for epoch in t:
             train_loss = 0.0
             for x1, x2, label in train_loader:
                 x1 = x1.to(self.device)
@@ -96,11 +97,12 @@ class SiameseTrainer:
 
             if current_lr <= self.min_lr:
                 break
-            print(
-                "Epoch: {}/{}, Train Loss: {:.4f}, Valid Loss: {:.4f}, LR: {:.6f}".format(
-                    epoch + 1, self.epochs, train_loss, valid_loss, current_lr
+            t.set_description(
+                "Train Loss: {:.7f}, Valid Loss: {:.7f}, LR: {:.6f}".format(
+                    train_loss, valid_loss, current_lr
                 )
             )
+            t.refresh()
 
         return self.siamese_net
 
